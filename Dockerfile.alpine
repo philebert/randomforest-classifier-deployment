@@ -1,0 +1,37 @@
+FROM python:3.9.7-alpine3.14
+
+COPY requirements-inference.txt requirements-inference-onnx.txt /
+
+RUN apk add --virtual .build-deps \
+        build-base \
+        cmake \
+        gfortran \
+        git \
+        g++ \
+        lapack-dev \
+        libexecinfo-dev \
+        linux-headers \
+        musl-dev && \
+    pip install -r requirements-inference.txt && \
+    git clone --recursive https://github.com/microsoft/onnxruntime && \
+    cd /onnxruntime && \
+    git checkout 3d0bd2596fe876b665eb9f5a0ca688dbebccbe31 && \
+    sh ./build.sh \
+        --update \
+        --build \
+        --build_wheel \
+        --config Release \
+        --parallel \
+        --enable_pybind \
+        --cmake_extra_defines onnxruntime_BUILD_UNIT_TESTS=OFF \
+        --skip_tests && \
+    apk del .build-deps && \
+    pip install /onnxruntime/build/Linux/Release/dist/onnxruntime-1.10.0-cp39-cp39-linux_x86_64.whl && \
+    rm -rf /onnxruntime && \
+    apk add libstdc++ lapack-dev
+
+COPY app /app
+
+RUN mv app/inference_onnx.py app/inference.py
+
+CMD ["gunicorn", "app.inference:app", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:80"]

@@ -1,0 +1,13 @@
+FROM python:3.9.7-slim-buster
+
+ARG RUNTIME
+
+COPY requirements-inference.txt requirements-inference-${RUNTIME}.txt /
+
+RUN pip install -r requirements-inference-${RUNTIME}.txt
+
+COPY app /app
+
+RUN mv app/inference_${RUNTIME}.py app/inference.py
+
+CMD ["gunicorn", "app.inference:app", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:80"]
