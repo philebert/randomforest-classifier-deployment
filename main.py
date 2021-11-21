@@ -20,7 +20,7 @@ from app.inference_scikitlearn import predict_sklearn
 from training import train_and_serialize
 
 
-def time_inference(repeat: int = 10, number: int = 1_0):
+def time_inference(repeat: int = 10, number: int = 1_000):
     """
     Measure inference time
     :param repeat:
@@ -31,7 +31,7 @@ def time_inference(repeat: int = 10, number: int = 1_0):
         for batch_size in (1, 10, 100):
             data = [[0.0, 0.0, 0.0, 0.0] for _ in range(batch_size)]
             min_time = min(timeit.Timer(partial(f, data)).repeat(repeat=repeat, number=number))
-            print(f"Timing for {runtime} batch size {batch_size}: {min_time}")
+            print(f"Timing for {runtime} batch size {batch_size}: {1_000 * min_time / number} ms")
 
 
 def build_docker_images() -> List[str]:
