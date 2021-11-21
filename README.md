@@ -73,7 +73,6 @@ Fastapi web framework along with gunicorn server and uvicorn worker class is use
 ## Remarks
 
 * Benchmark done on system with Intel® Core™ i7-7700HQ
-* no security aspects taken into account (e.g. root user in container)
 
 ## References
 

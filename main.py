@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import time
 import timeit
 from functools import partial
@@ -18,7 +20,7 @@ from app.inference_scikitlearn import predict_sklearn
 from training import train_and_serialize
 
 
-def time_inference(repeat: int = 10, number: int = 1_000):
+def time_inference(repeat: int = 10, number: int = 1_0):
     """
     Measure inference time
     :param repeat:
@@ -62,7 +64,7 @@ def build_docker_images() -> List[str]:
     return images
 
 
-def test_images(model, x_test, y_test, images: List[str], host_port: int = 8000, n_memory_samples: int = 10):
+def test_images(model, x_test, y_test, images: List[str], host_port: int = 8000, n_memory_samples: int = 5):
     """
     Run container and use client to test web service
     :param images:
@@ -94,7 +96,7 @@ def test_images(model, x_test, y_test, images: List[str], host_port: int = 8000,
             stats = c.stats(stream=False)
             memory_usages = []
             for _ in range(n_memory_samples):
-                time.sleep(3)
+                time.sleep(1)
                 memory_usages.append(stats.get("memory_stats").get("usage") / 10**6)
             print(f'Memory usage mean: {np.mean(memory_usages)}, std: {np.std(memory_usages)} MB')
         except Exception as e:

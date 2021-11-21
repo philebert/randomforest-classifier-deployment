@@ -32,6 +32,12 @@ RUN apk add --virtual .build-deps \
 
 COPY app /app
 
+# create non root user
+RUN addgroup appgroup &&\
+    adduser -D -G appgroup appuser && \
+    chown -R appuser /app
+USER appuser
+
 RUN mv app/inference_onnx.py app/inference.py
 
 CMD ["gunicorn", "app.inference:app", "-k", "uvicorn.workers.UvicornWorker", "-b", "0.0.0.0:80"]
