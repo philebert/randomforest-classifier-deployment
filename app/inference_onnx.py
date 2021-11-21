@@ -4,7 +4,7 @@ import uvicorn as uvicorn
 from fastapi import FastAPI
 import onnxruntime as rt
 
-from app.inference_models import InferenceBatchRequest, Prediction, TARGET_NAMES
+from app.inference_models import InferenceBatchRequest, Prediction, TARGET_NAMES, FEATURE_NAMES
 
 
 def predict_onnx(data: List) -> List[str]:
@@ -20,7 +20,7 @@ app = FastAPI()
 @app.post("/", response_model=Prediction)
 def predict(batch: InferenceBatchRequest) -> Prediction:
     predicted_classes = predict_onnx(
-        [[s.sepal_length_cm, s.sepal_width_cm, s.petal_length_cm, s.petal_width_cm] for s in batch.data]
+        [[getattr(s, feature) for feature in FEATURE_NAMES] for s in batch.data]
     )
     return Prediction(classes=predicted_classes)
 
